@@ -1,0 +1,118 @@
+function loadMap() {
+	
+	var osmLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+		var osmURL = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+		var osmAttrib = '&copy; ' + osmLink;
+	var osmMap = L.tileLayer(osmURL, {attribution: osmAttrib});
+		
+	var tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png', {
+		minZoom: 5,
+		maxZoom: 30,
+		attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/about-carto/">CARTO</a>',
+	});
+	var center = new L.LatLng(55.944778, -3.193588);
+
+	var map = new L.Map('map', {center: center, zoom: 12, layers: [tiles]});
+	map.attributionControl.setPrefix('Data Source: The City of Edinburgh Council, https://data.edinburghcouncilmaps.info/datasets/');
+	
+	var baseLayers = {
+			"OSM Mapnik": osmMap,
+			"CartoDB": tiles
+		};
+
+	var markers = new L.MarkerClusterGroup();
+
+	var greenIcon = L.icon({
+		iconUrl: 'css/images/leaf-green.png',
+		shadowUrl: 'css/images/leaf-shadow.png',
+		iconSize:     [38, 95],
+		shadowSize:   [50, 64],
+		iconAnchor:   [22, 94],
+		shadowAnchor: [4, 62],
+		popupAnchor:  [-3, -76]
+	});
+	var PearIcon = L.icon({
+		iconUrl: 'css/images/leaf-Pear.png',
+		shadowUrl: 'css/images/leaf-shadow.png',
+		iconSize:     [38, 95],
+		shadowSize:   [50, 64],
+		iconAnchor:   [22, 94],
+		shadowAnchor: [4, 62],
+		popupAnchor:  [-3, -76]
+	});
+	var ChestnutIcon = L.icon({
+		iconUrl: 'css/images/leaf-Chestnut.png',
+		shadowUrl: 'css/images/leaf-shadow.png',
+		iconSize:     [38, 95],
+		shadowSize:   [50, 64],
+		iconAnchor:   [22, 94],
+		shadowAnchor: [4, 62],
+		popupAnchor:  [-3, -76]
+	});
+	var CherryIcon = L.icon({
+		iconUrl: 'css/images/leaf-Cherry.png',
+		shadowUrl: 'css/images/leaf-shadow.png',
+		iconSize:     [38, 95],
+		shadowSize:   [50, 64],
+		iconAnchor:   [22, 94],
+		shadowAnchor: [4, 62],
+		popupAnchor:  [-3, -76]
+	});
+	var AppleIcon = L.icon({
+		iconUrl: 'css/images/leaf-Apple.png',
+		shadowUrl: 'css/images/leaf-shadow.png',
+		iconSize:     [38, 95],
+		shadowSize:   [50, 64],
+		iconAnchor:   [22, 94],
+		shadowAnchor: [4, 62],
+		popupAnchor:  [-3, -76]
+	});
+	var PlumIcon = L.icon({
+		iconUrl: 'css/images/leaf-Plum.png',
+		shadowUrl: 'css/images/leaf-shadow.png',
+		iconSize:     [38, 95],
+		shadowSize:   [50, 64],
+		iconAnchor:   [22, 94],
+		shadowAnchor: [4, 62],
+		popupAnchor:  [-3, -76]
+	});
+
+	for (var i = 0; i < TreePoints.length; i++) {
+		var a = TreePoints[i];
+		if (a[4]=='Pyrus spp.') var TreeIcon = PearIcon;
+		else if (a[5]=='Horse Chestnut') var TreeIcon = ChestnutIcon;
+		else if (a[5]=='Cherry spp') var TreeIcon = CherryIcon;
+		else if (a[4]=='Malus spp.') var TreeIcon = AppleIcon;
+		else if (a[5]=='Purple-leaved Plum') var TreeIcon = PlumIcon;
+		else var TreeIcon = greenIcon;
+		var marker = new L.Marker(new L.LatLng(a[0], a[1]), { icon: TreeIcon });
+		marker.bindPopup("<b> Tree No:"+a[2]+"</b><br><br>Common name: "+a[5]+"<br>Latin Name: "+a[4]+"<br>Site: "+a[3]+"<br>Height: "+a[7]+"<br>Spread: "+a[8]+"<br>Easting: "+a[9]+"<br>Northing: "+a[10]).openPopup();
+		markers.addLayer(marker);
+	}
+	map.addLayer(markers);
+	
+	L.control.locate().addTo(map);
+	
+	L.control.scale({
+		maxWidth: 100,
+		metric: true,
+		imperial: false, 
+		position: 'bottomright'
+	}).addTo(map);
+
+	var popup = L.popup();
+	function onMapClick(e) {
+		popup
+		    .setLatLng(e.latlng)
+		    .setContent("You clicked the map at " + e.latlng.toString())
+		    .openOn(map);
+	}
+	map.on('click', onMapClick);
+	
+	var overlayLayer = {
+            "Trees": markers
+        };
+	
+	L.control.layers(baseLayers, overlayLayer).addTo(map);
+}
+
